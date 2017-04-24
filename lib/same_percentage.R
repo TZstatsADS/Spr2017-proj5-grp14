@@ -110,21 +110,55 @@ f <- function(i) {
   len <- length(dic1) + length(dic2) - sum(dic1 %in% dic2)
   same <- sum(dic1 %in% dic2)/len
   # extract verb and noun in each question
-  Q1Tag <- tagPOS(Q1)
-  Q2Tag <- tagPOS(Q2)
-  v_n.result <- v_n.length(Q1Tag, Q2Tag)
-  return(c(L1, L2, L.rem1, L.rem2, same, ratio, v_n.result))
+  # Q1Tag <- tagPOS(Q1)
+  # Q2Tag <- tagPOS(Q2)
+  # v_n.result <- v_n.length(Q1Tag, Q2Tag)
+  input1 <- tagPOS(Q1)
+  input2 <- tagPOS(Q2)
+  Q1TV <- v_n(input1, "VB")
+  Q1TN <- v_n(input1, "NN")
+  Q2TV <- v_n(input2, "VB")
+  Q2TN <- v_n(input2, "NN")
+  # original number of verb and noun
+  LV1 <- length(Q1TV)
+  LV2 <- length(Q2TV)
+  LN1 <- length(Q1TN)
+  LN2 <- length(Q2TN)
+  Q1TV <- rem_eng(Q1TV)
+  Q2TV <- rem_eng(Q2TV)
+  Q1TN <- rem_eng(Q1TN)
+  Q2TN <- rem_eng(Q2TN)
+  # number of verb and noun after remove stopwords
+  LV.rem1 <- length(Q1TV)
+  LV.rem2 <- length(Q2TV)
+  LN.rem1 <- length(Q1TN)
+  LN.rem2 <- length(Q2TN)
+  if (LV.rem1 > LV.rem2) {Q <- Q1TV; Q1TV <- Q2TV; Q2TV <- Q}
+  if (LN.rem1 > LN.rem2) {Q <- Q1TN; Q1TN <- Q2TN; Q2TN <- Q}
+  # percentage of same verb and noun between two questions
+  len.V <- LV.rem1 + LV.rem2 - sum(Q1TV %in% Q2TV)
+  same.V <- sum(Q1TV %in% Q2TV)/len.V
+  len.N <- LN.rem1 + LN.rem2 - sum(Q1TN %in% Q2TN)
+  same.N <- sum(Q1TN %in% Q2TN)/len.N
+  output <- c(LV1, LV2, LN1, LN2, LV.rem1, LV.rem2, LN.rem1, LN.rem2, same.V, same.N)
+  output[is.na(output) == T] <- 0
+  return(c(L1, L2, L.rem1, L.rem2, same, ratio, output))
 }
 
-feature <- matrix(NA, nrow = S, ncol = 16)
-for(i in 562:S) {
-  feature[i,] <- f(i)
-  gc(reset = TRUE)
-}
+#feature <- matrix(NA, nrow = S, ncol = 16)
+#for(i in 1:S) {
+#  feature[i,] <- f(i)
+#  gc(reset = TRUE)
+#}
+
+#write.csv(feature, file = "feature.csv")
+feature <- read.csv("feature.csv")
+feature <- feature[,-1]
+
 
 
 #feature <- t(apply(as.matrix(c(1:100)), 1, f))
-#T1$s2[T1$same < 0.5] <- 0.25
+#T1$s2[T1$same < 0.5] <- 0.252
 #T1$s2[T1$same >= 0.5] <- 0.75
 #T1$s2 <- round(T1$same, 1)
 #table(T1$is_duplicate, T1$s2)
