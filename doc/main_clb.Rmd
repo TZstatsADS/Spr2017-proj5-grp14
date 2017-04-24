@@ -1,0 +1,82 @@
+
+
+```{r}
+
+library(NLP)
+library(tm)
+library(openNLP)
+library(data.table)
+library(koRpus)
+library(XLConnectJars)
+library(XLConnect)
+library(parallel)
+
+```
+
+
+
+```{r}
+train <- read.csv("../data/train.csv", header = T,as.is = T)
+train<-train[,4:6]
+# test <- read.csv("test.csv", header = T, as.is = T)
+
+# table(train$is_duplicate[1:10000])
+
+
+T1 <- train[25000:50000, ] # may need to change name
+
+
+
+#
+f <- function(Q) {
+  library(openNLP)
+  library(tm)
+  source("../lib/function.R")
+  # input two questions
+  #Q1 <- T1$question1[i]
+  #Q2 <- T1$question2[i]
+  Q1<-Q[1]
+  Q2<-Q[2]
+  # number of words in each question
+  L1 <- length(strsplit(Q1, " ")[[1]])
+  L2 <- length(strsplit(Q2, " ")[[1]])
+  # ratio of length
+  ratio <- min(c(L1, L2)) / max(c(L1, L2))
+  # remove punctuation and stopwords
+  dic1 <- rem_eng(Q1)
+  dic2 <- rem_eng(Q2)
+  L.rem1 <- length(dic1)
+  L.rem2 <- length(dic2)
+  # percentage of same words between two questions
+  if (length(dic1) > length(dic2)) {Q <- dic1; dic1 <- dic2; dic2 <- Q}
+  sa<-sum(dic1 %in% dic2)
+  len <- length(dic1) + length(dic2) - sa
+  same <- sa/len
+  # extract verb and noun in each question
+  Q1Tag <- tagPOS(Q1)
+  Q2Tag <- tagPOS(Q2)
+  v_n.result <- v_n.length(Q1Tag, Q2Tag)
+  gc(reset = TRUE)
+  return(c(L1, L2, L.rem1, L.rem2, same, ratio, v_n.result))
+}
+
+cl <- makeCluster(getOption("cl.cores", 8))
+
+t1<-Sys.time()
+
+feature <-parApply(cl, T1,1, f)
+t2<-Sys.time()
+t2-t1
+#feature <- t(apply(as.matrix(c(1:100)), 1, f))
+#T1$s2[T1$same < 0.5] <- 0.25
+#T1$s2[T1$same >= 0.5] <- 0.75
+#T1$s2 <- round(T1$same, 1)
+#table(T1$is_duplicate, T1$s2)
+
+feature<-t(feature)
+write.csv(feature,file="feature_25000:50000.csv")
+
+
+
+```
+
