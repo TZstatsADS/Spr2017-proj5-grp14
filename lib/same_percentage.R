@@ -1,21 +1,42 @@
-library("NLP")
-library("tm")
+options(java.parameters = "- Xmx1024m")
+library(NLP)
+library(tm)
+library(openNLP)
+library(data.table)
+library(koRpus)
+library(XLConnectJars)
+library(XLConnect)
 
 setwd("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/data")
 
 train <- read.csv("train.csv", header = T, as.is = T)
 train$id <- train$id+1
-test <- read.csv("test.csv", header = T, as.is = T)
+# test <- read.csv("test.csv", header = T, as.is = T)
 
-table(train$is_duplicate[1:10000])
+# table(train$is_duplicate[1:10000])
 
-set.seed(426)
-index <- sample(1:nrow(train), 10000)
+S <- 50000
+# set.seed(426)
+# index <- sample(1:nrow(train), S)
+index <- 1:S
 T1 <- train[index, ] # may need to change name
 
 # decompose a string into words
 dec <- function(z) {
   return(strsplit(z, split = " "))
+}
+
+# function tagPOS
+tagPOS <-  function(x, ...) {
+  s <- as.String(x)
+  word_token_annotator <- Maxent_Word_Token_Annotator()
+  a2 <- Annotation(1L, "sentence", 1L, nchar(s))
+  a2 <- annotate(s, word_token_annotator, a2)
+  a3 <- annotate(s, Maxent_POS_Tag_Annotator(), a2)
+  a3w <- a3[a3$type == "word"]
+  POStags <- unlist(lapply(a3w$features, `[[`, "POS"))
+  POStagged <- paste(sprintf("%s/%s", s[a3w], POStags), collapse = " ")
+  list(POStagged = POStagged, POStags = POStags)
 }
 
 # remove stopwords "english"
@@ -30,52 +51,85 @@ rem_eng <- function(input) {
   return(dic)
 }
 
-#
-position <- function(i, dic1, dic2) {
-  loc <- c()
-  if (T1$is_duplicate[i] == 1) {
-    1#...
-  }
-  
+# extract verb and noun
+v_n <- function(input, v.n) {
+  output <- sapply(strsplit(input$POStagged, paste("[[:punct:]]*/", v.n, ".?", sep = "")),
+                   function(x) {res = sub("(^.*\\s)(\\w+$)", "\\2", x); res[!grepl("\\s", res)]} )
+  return(output)
 }
 
-##
+v_n.length <- function(input1, input2) {
+  Q1TV <- v_n(input1, "VB")
+  Q1TN <- v_n(input1, "NN")
+  Q2TV <- v_n(input2, "VB")
+  Q2TN <- v_n(input2, "NN")
+  # original number of verb and noun
+  LV1 <- length(Q1TV)
+  LV2 <- length(Q2TV)
+  LN1 <- length(Q1TN)
+  LN2 <- length(Q2TN)
+  Q1TV <- rem_eng(Q1TV)
+  Q2TV <- rem_eng(Q2TV)
+  Q1TN <- rem_eng(Q1TN)
+  Q2TN <- rem_eng(Q2TN)
+  # number of verb and noun after remove stopwords
+  LV.rem1 <- length(Q1TV)
+  LV.rem2 <- length(Q2TV)
+  LN.rem1 <- length(Q1TN)
+  LN.rem2 <- length(Q2TN)
+  if (LV.rem1 > LV.rem2) {Q <- Q1TV; Q1TV <- Q2TV; Q2TV <- Q}
+  if (LN.rem1 > LN.rem2) {Q <- Q1TN; Q1TN <- Q2TN; Q2TN <- Q}
+  # percentage of same verb and noun between two questions
+  len.V <- LV.rem1 + LV.rem2 - sum(Q1TV %in% Q2TV)
+  same.V <- sum(Q1TV %in% Q2TV)/len.V
+  len.N <- LN.rem1 + LN.rem2 - sum(Q1TN %in% Q2TN)
+  same.N <- sum(Q1TN %in% Q2TN)/len.N
+  output <- c(LV1, LV2, LN1, LN2, LV.rem1, LV.rem2, LN.rem1, LN.rem2, same.V, same.N)
+  output[is.na(output) == T] <- 0
+  return(output)
+}
+
+
+#
 f <- function(i) {
-  Q2 <- T1$question1[i]
-  Q1 <- T1$question2[i]
+  # input two questions
+  Q1 <- T1$question1[i]
+  Q2 <- T1$question2[i]
+  # number of words in each question
+  L1 <- length(unlist(strsplit(Q1, " ")))
+  L2 <- length(unlist(strsplit(Q2, " ")))
+  # ratio of length
+  ratio <- min(c(L1, L2)) / max(c(L1, L2))
+  # remove punctuation and stopwords
   dic1 <- rem_eng(Q1)
   dic2 <- rem_eng(Q2)
-  if (length(dic1) < length(dic2)) {Q <- dic1; dic1 <- dic2; dic2 <- Q}
-  same <- sum(dic1 %in% dic2)/length(dic1)
-  return(same)}
+  L.rem1 <- length(dic1)
+  L.rem2 <- length(dic2)
+  # percentage of same words between two questions
+  if (length(dic1) > length(dic2)) {Q <- dic1; dic1 <- dic2; dic2 <- Q}
+  len <- length(dic1) + length(dic2) - sum(dic1 %in% dic2)
+  same <- sum(dic1 %in% dic2)/len
+  # extract verb and noun in each question
+  Q1Tag <- tagPOS(Q1)
+  Q2Tag <- tagPOS(Q2)
+  v_n.result <- v_n.length(Q1Tag, Q2Tag)
+  return(c(L1, L2, L.rem1, L.rem2, same, ratio, v_n.result))
+}
 
-T1$same <- apply(as.matrix(c(1:10000)), 1, f)
-T1$s2[T1$same < 0.5] <- 0.25
-T1$s2[T1$same >= 0.5] <- 0.75
-T1$s2 <- round(T1$same, 1)
-table(T1$is_duplicate, T1$s2)
+feature <- matrix(NA, nrow = S, ncol = 16)
+for(i in 562:S) {
+  feature[i,] <- f(i)
+  gc(reset = TRUE)
+}
 
-# T1 <- 1:10000
 
-#   0.25 0.75
-# 0 4015 2274
-# 1  978 2733
+#feature <- t(apply(as.matrix(c(1:100)), 1, f))
+#T1$s2[T1$same < 0.5] <- 0.25
+#T1$s2[T1$same >= 0.5] <- 0.75
+#T1$s2 <- round(T1$same, 1)
+#table(T1$is_duplicate, T1$s2)
 
-#      0  0.1  0.2  0.3  0.4  0.5  0.6  0.7  0.8  0.9    1
-# 0 1072  430 1029  842  633  683  333  435  526  182  124
-# 1    2    1  103  344  508  716  488  540  589   63  357
 
-# T1 <- random, set.seed(426)
-
-#   0.25 0.75    1
-# 0 4009 2282    1
-# 1 1020 2688    0
-
-#      0  0.1  0.2  0.3  0.4  0.5  0.6  0.7  0.8  0.9    1
-# 0 1045  460 1019  799  671  637  347  464  514  211  124
-# 1    2    1  113  398  475  694  487  511  606   67  354
-
-#]freq <- sort(table(dic), decreasing = T) # frequency dictionary
 
 
 
