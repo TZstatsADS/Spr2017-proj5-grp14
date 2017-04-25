@@ -84,7 +84,15 @@ Q2.sentiment <- transform(Q2.sentiment, net = positive - negative)
 ##feature extraction
 
 ```{r}
-feature<-data.frame()
+feature<-data.frame(punc=Q2.num$punc-Q1.num$punc)
+feature$modal<-(Q2.num$modal-Q1.num$modal)/(Q1.num$word+Q2.num$word)
+feature$length<-(Q2.num$word-Q1.num$word)/(Q1.num$word+Q2.num$word)
+feature$neg<-(Q2.num$neg-Q1.num$neg)/(Q1.num$word+Q2.num$word)
+feature$sentiment<-Q2.sentiment$net-Q1.sentiment$net
+feature$positive<-Q2.sentiment$positive-Q1.sentiment$positive
+feature$negative<-Q2.sentiment$negative-Q1.sentiment$negative
+
+write.csv(feature,file = "../output/feature_lyq.csv")
 ```
 
 
