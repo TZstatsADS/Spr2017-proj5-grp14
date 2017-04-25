@@ -74,9 +74,50 @@ t2-t1
 #table(T1$is_duplicate, T1$s2)
 
 feature<-t(feature)
-write.csv(feature,file="feature_25000:50000.csv")
+write.csv(feature,file="feature_25000-50000.csv")
 
 
+
+```
+
+
+
+
+```{r}
+feature2 <- function(q) {
+  library(tm)
+  dec <- function(z) {
+  return(strsplit(z, split = " "))
+}
+  pros <- function(input) {
+  dic <- Corpus(VectorSource(input))
+  dic <- tm_map(dic, content_transformer(tolower))
+  dic <- tm_map(dic, removePunctuation)
+  dic <- lapply(dic, dec)
+  dic <- unlist(dic)
+  if ("" %in% dic) { dic <- dic[-which(dic == "")]}
+  return(dic)
+}
+  q1<-pros(q[1])
+  q2<-pros(q[2])
+  a<-c("what","how","why","which","who","whose","whom","when","where")
+  f1<-sapply(a, "%in%" ,q1)
+  f2<-sapply(a, "%in%" ,q1)
+  f<-f1%*%t(f2)
+  return(f[lower.tri(f,diag=T)])
+}
+T2<-train[1:50000, ]
+cl <- makeCluster(getOption("cl.cores", 8))
+
+
+t3<-Sys.time()
+feature2 <-parApply(cl, T2,1, feature2)
+t4<-Sys.time()
+t4-t3
+
+feature2 <-t(feature2)
+
+write.csv(feature2,file="feature_yiwenci.csv")
 
 ```
 
