@@ -1,5 +1,5 @@
 ---
-title: "feature_lyq"
+title: "main_lyq"
 author: "Yaqin Li (yl3578)"
 date: "4/24/2017"
 output: html_document
