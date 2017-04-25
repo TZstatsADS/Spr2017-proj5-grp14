@@ -157,13 +157,45 @@ feature <- feature[,-1]
 
 
 
-#feature <- t(apply(as.matrix(c(1:100)), 1, f))
-#T1$s2[T1$same < 0.5] <- 0.252
-#T1$s2[T1$same >= 0.5] <- 0.75
-#T1$s2 <- round(T1$same, 1)
-#table(T1$is_duplicate, T1$s2)
+# find word location in the total dictionary and compute the probability of each word
+find_loc <- function(input) {
+  output <- rep(0, L)
+  for (i in 1:length(input)) {
+    index <- which(dic == names(input)[i])
+    output[index] <- input[i] / sum(input)
+  }
+  return(output)
+}
+
+f <- function(i) {
+  # input two questions
+  Q1 <- T1$question1[i]
+  Q2 <- T1$question2[i]
+  # extract verb and noun in each question
+
+  input1 <- tagPOS(Q1)
+  input2 <- tagPOS(Q2)
+  table(input1$POStags)
+  table(input2$POStags)
 
 
 
+}
 
-
+CC - Coordinating conjunction
+CD - Cardinal number
+DT - Determiner
+"EX", "FW", "IN", "JJ", "JJR", "JJS", "LS", "MD", "NN", "NNS", "NNP", "NNPS", "PDT", "POS", "PRP"PRP$ - Possessive pronoun
+RB - Adverb
+RBR - Adverb, comparative
+RBS - Adverb, superlative
+RP - Particle
+SYM - Symbol
+TO - to
+UH - Interjection
+VB - Verb, base form
+VBD - Verb, past tense
+VBG - Verb, gerund or present participle
+VBN - Verb, past participle
+VBP - Verb, non-3rd person singular present
+VBZ","WDT","WP","WP$","WRB"
