@@ -106,8 +106,8 @@ f <- function(i) {
   L.rem1 <- length(dic1)
   L.rem2 <- length(dic2)
   # percentage of same words between two questions
-  if (length(dic1) > length(dic2)) {Q <- dic1; dic1 <- dic2; dic2 <- Q}
-  len <- length(dic1) + length(dic2) - sum(dic1 %in% dic2)
+  #if (L.rem1 < L.rem2) {Q <- dic1; dic1 <- dic2; dic2 <- Q}
+  len <- L.rem1 + L.rem2 - sum(dic1 %in% dic2)
   same <- sum(dic1 %in% dic2)/len
   # extract verb and noun in each question
   # Q1Tag <- tagPOS(Q1)
@@ -133,8 +133,8 @@ f <- function(i) {
   LV.rem2 <- length(Q2TV)
   LN.rem1 <- length(Q1TN)
   LN.rem2 <- length(Q2TN)
-  if (LV.rem1 > LV.rem2) {Q <- Q1TV; Q1TV <- Q2TV; Q2TV <- Q}
-  if (LN.rem1 > LN.rem2) {Q <- Q1TN; Q1TN <- Q2TN; Q2TN <- Q}
+  #if (LV.rem1 > LV.rem2) {Q <- Q1TV; Q1TV <- Q2TV; Q2TV <- Q}
+  #if (LN.rem1 > LN.rem2) {Q <- Q1TN; Q1TN <- Q2TN; Q2TN <- Q}
   # percentage of same verb and noun between two questions
   len.V <- LV.rem1 + LV.rem2 - sum(Q1TV %in% Q2TV)
   same.V <- sum(Q1TV %in% Q2TV)/len.V
@@ -145,57 +145,68 @@ f <- function(i) {
   return(c(L1, L2, L.rem1, L.rem2, same, ratio, output))
 }
 
+# feature: "same"
 #feature <- matrix(NA, nrow = S, ncol = 16)
 #for(i in 1:S) {
 #  feature[i,] <- f(i)
 #  gc(reset = TRUE)
 #}
 
-#write.csv(feature, file = "feature.csv")
+write.csv(feature, file = "feature.csv")
 feature <- read.csv("feature.csv")
 feature <- feature[,-1]
 
+composition <- c("CC", "CD", "DT", "EX", "FW", "IN", "JJ", "JJR", "JJS", "LS", "MD", "NN", "NNS", "NNP"
+                 , "NNPS", "PDT", "POS", "PRP", "PRP$", "RB", "RBR", "RBS", "RP", "SYM", "TO", "UH", "VB"
+                 , "VBD", "VBG", "VBN", "VBP", "VBZ", "WDT","WP","WP$","WRB", ".", "-LRB-", "-RRB-", ","
+                 , ":", "''", "``")
 
+L <- length(composition)
 
 # find word location in the total dictionary and compute the probability of each word
 find_loc <- function(input) {
+  input <- table(input$POStags)
   output <- rep(0, L)
   for (i in 1:length(input)) {
-    index <- which(dic == names(input)[i])
-    output[index] <- input[i] / sum(input)
+    index <- which(composition == names(input)[i])
+    output[index] <- input[i]
   }
   return(output)
 }
 
-f <- function(i) {
+# composition of Q1, Q2
+com <- function(input, Q) {
   # input two questions
-  Q1 <- T1$question1[i]
-  Q2 <- T1$question2[i]
-  # extract verb and noun in each question
-
-  input1 <- tagPOS(Q1)
-  input2 <- tagPOS(Q2)
-  table(input1$POStags)
-  table(input2$POStags)
-
-
-
+  Ques <- ifelse(Q==1, input$question1, input$question2)
+  # different composition in each question
+  Questag <- tagPOS(Ques)
+  output <- find_loc(Questag)
+  return(output)
 }
 
-CC - Coordinating conjunction
-CD - Cardinal number
-DT - Determiner
-"EX", "FW", "IN", "JJ", "JJR", "JJS", "LS", "MD", "NN", "NNS", "NNP", "NNPS", "PDT", "POS", "PRP"PRP$ - Possessive pronoun
-RB - Adverb
-RBR - Adverb, comparative
-RBS - Adverb, superlative
-RP - Particle
-SYM - Symbol
-TO - to
-UH - Interjection
-VB - Verb, base form
-VBD - Verb, past tense
-VBG - Verb, gerund or present participle
-VBN - Verb, past participle
-VBP - Verb, non-3rd person singular present
-VBZ","WDT","WP","WP$","WRB"
+#### wait!!!
+com.Q1 <- matrix(NA, nrow = S, ncol = L)
+com.Q2 <- matrix(NA, nrow = S, ncol = L)
+for(i in 43001: 44000) {
+  com.Q1[i, ] <- com(T1[i, ], 1)
+  com.Q2[i, ] <- com(T1[i, ], 2)
+  gc(reset = TRUE)
+}
+
+# difference of composition between Q1 and Q2
+com.diff <- function(input) {
+  # different composition in each question
+  Q1 <- tagPOS(input$question1)
+  Q2 <- tagPOS(input$question2)
+  Q1 <- find_loc(Q1)
+  Q2 <- find_loc(Q2)
+  output <- abs(Q1-Q2)
+  return(output)
+}
+
+# feature2: composition
+feature2 <- matrix(NA, nrow = S, ncol = L)
+for(i in 1:S) {
+  feature2[i,] <- com.diff(i)
+  gc(reset = TRUE)
+}
