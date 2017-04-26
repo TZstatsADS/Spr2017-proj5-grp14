@@ -96,4 +96,15 @@ write.csv(feature,file = "../output/feature_lyq.csv")
 ```
 
 
+##combine features
+
+```{r}
+tfeature<-read.csv("../output/feature.csv",header = TRUE)[,-1]
+tfeature<-cbind(tfeature,read.csv("../output/feature_yiwenci.csv",header = TRUE)[,-1])
+tfeature<-cbind(tfeature,read.csv("../output/feature_lyq.csv",header = TRUE)[,-1])
+tfeature<-cbind(tfeature,(read.csv("../output/parsing.Q1.csv",header = TRUE)-read.csv("../output/parsing.Q2.csv",header = TRUE))[,-1])
+write.csv(tfeature,file="../output/allfeatures.csv")
+```
+
+
 
