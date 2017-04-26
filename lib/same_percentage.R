@@ -146,15 +146,14 @@ f <- function(i) {
 }
 
 # feature: "same"
-#feature <- matrix(NA, nrow = S, ncol = 16)
-#for(i in 1:S) {
-#  feature[i,] <- f(i)
-#  gc(reset = TRUE)
-#}
+feature <- matrix(NA, nrow = S, ncol = 16)
+for(i in 1:S) {
+  feature[i,] <- f(i)
+  gc(reset = TRUE)
+}
 
 write.csv(feature, file = "feature.csv")
-feature <- read.csv("feature.csv")
-feature <- feature[,-1]
+
 
 composition <- c("CC", "CD", "DT", "EX", "FW", "IN", "JJ", "JJR", "JJS", "LS", "MD", "NN", "NNS", "NNP"
                  , "NNPS", "PDT", "POS", "PRP", "PRP$", "RB", "RBR", "RBS", "RP", "SYM", "TO", "UH", "VB"
@@ -187,7 +186,7 @@ com <- function(input, Q) {
 #### wait!!!
 com.Q1 <- matrix(NA, nrow = S, ncol = L)
 com.Q2 <- matrix(NA, nrow = S, ncol = L)
-for(i in 43001: 44000) {
+for(i in 44001: 45000) {
   com.Q1[i, ] <- com(T1[i, ], 1)
   com.Q2[i, ] <- com(T1[i, ], 2)
   gc(reset = TRUE)
@@ -210,3 +209,6 @@ for(i in 1:S) {
   feature2[i,] <- com.diff(i)
   gc(reset = TRUE)
 }
+
+write.csv(com.Q1, file = "parsing.Q1.csv")
+write.csv(com.Q2, file = "parsing.Q2.csv")
