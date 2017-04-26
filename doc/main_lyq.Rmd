@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 train <- read.csv("../data/train.csv", header = T, as.is = T)
 Q1<-train[1:50000,4]
 Q2<-train[1:50000,5]
-label<-train[1:50000,5]
+label<-train[1:50000,6]
 
 library(tm)
 library(qdap)
@@ -115,7 +115,11 @@ if(!require("gbm")){
 
 library(gbm)
 
-train <- function(dat_train, label_train, par=NULL){
+
+cv.function <- function(X.train, y.train, d, K){
+  
+  library(gbm)
+  train <- function(dat_train, label_train, par=NULL){
   if(is.null(par)){
     depth <- 3
   } else {
@@ -131,19 +135,17 @@ train <- function(dat_train, label_train, par=NULL){
   best_iter <- gbm.perf(fit_gbm, method="OOB", plot.it = FALSE)
   
   return(list(fit=fit_gbm, iter=best_iter))
-}
-
-
-
-test <- function(fit_train, dat_test){
+  }
+  
+  test <- function(fit_train, dat_test){
   
   pred <- predict(fit_train$fit, newdata=dat_test, 
                   n.trees=fit_train$iter, type="response")
   
   return(as.numeric(pred> 0.5))
-}
+  }
 
-cv.function <- function(X.train, y.train, d, K){
+  
   n <- length(y.train)
   n.fold <- floor(n/K)
   s <- sample(rep(1:K, c(rep(n.fold, K-1), n-(K-1)*n.fold)))  
