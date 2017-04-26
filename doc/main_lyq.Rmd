@@ -106,5 +106,9 @@ tfeature<-cbind(tfeature,(read.csv("../output/parsing.Q1.csv",header = TRUE)-rea
 write.csv(tfeature,file="../output/allfeatures.csv")
 ```
 
+##train model
+
+```{r}
+```
 
 
