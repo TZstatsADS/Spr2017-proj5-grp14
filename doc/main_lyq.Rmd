@@ -99,11 +99,16 @@ write.csv(feature,file = "../output/feature_lyq.csv")
 ##combine features
 
 ```{r}
-tfeature<-read.csv("../output/feature.csv",header = TRUE)[,-1]
-tfeature<-cbind(tfeature,read.csv("../output/feature_yiwenci.csv",header = TRUE)[,-1])
-tfeature<-cbind(tfeature,read.csv("../output/feature_lyq.csv",header = TRUE)[,-1])
-tfeature<-cbind(tfeature,(read.csv("../output/parsing.Q1.csv",header = TRUE)-read.csv("../output/parsing.Q2.csv",header = TRUE))[,-1])
-write.csv(tfeature,file="../output/allfeatures.csv")
+tfeature1<-read.csv("../output/feature.csv",header = TRUE)[,-1]
+tfeature2<-read.csv("../output/feature_yiwenci.csv",header = TRUE)[,-1]
+tfeature3<-cbind(tfeature1,tfeature2)
+tfeature4<-read.csv("../output/feature_lyq.csv",header = TRUE)[,-1]
+tfeature5<-(read.csv("../output/parsing.Q1.csv",header = TRUE)-read.csv("../output/parsing.Q2.csv",header = TRUE))[,-1]
+tfeature6<-cbind(tfeature3,tfeature4)
+tfeature7<-read.csv("../output/allfeatures.csv",header = TRUE)[,-1]
+
+tfeature<-list(tfeature1,tfeature2,tfeature3,tfeature4,tfeature5,tfeature6,tfeature7)
+#write.csv(tfeature,file="../output/allfeatures.csv")
 ```
 
 ##train model (gbm)
@@ -170,18 +175,25 @@ cv.function <- function(X.train, y.train, d, K){
 
 
 
-k<-3
-cl <- makeCluster(getOption("cl.cores", 8))
-err<-parLapply(cl, 1:16, cv.function,X.train=tfeature, y.train=label, K=k)
-plot(err)
-d<-which.min(err)
-gbmbase <- gbm.fit(x=tfeature, y=label,
+
+
+k<-2
+e<-c()
+gbmbase<-list()
+for (i in 6:7){
+  cl <- makeCluster(getOption("cl.cores", 8))
+  err<-parLapply(cl, 1:8, cv.function,X.train=tfeature[[i]], y.train=label, K=k)
+  e[i]<-min(unlist(err))
+  d<-which.min(unlist(err))
+  gbmbase[[i]] <- gbm.fit(x=tfeature[[i]], y=label,
                      n.trees=1000,
                      distribution="bernoulli",
                      interaction.depth=d, 
                      bag.fraction = 0.5,
                      verbose=FALSE)
+}
 save(gbmbase,file="../output/gbmmodel.RData")
+save(e,file="../output/gbmerror.RData")
 ```
 
 
