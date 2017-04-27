@@ -180,9 +180,9 @@ cv.function <- function(X.train, y.train, d, K){
 k<-2
 e<-c()
 gbmbase<-list()
-for (i in 6:7){
+for (i in 1:7){
   cl <- makeCluster(getOption("cl.cores", 8))
-  err<-parLapply(cl, 1:8, cv.function,X.train=tfeature[[i]], y.train=label, K=k)
+  err<-parLapply(cl, 1:16, cv.function,X.train=tfeature[[i]], y.train=label, K=k)
   e[i]<-min(unlist(err))
   d<-which.min(unlist(err))
   gbmbase[[i]] <- gbm.fit(x=tfeature[[i]], y=label,
@@ -194,6 +194,16 @@ for (i in 6:7){
 }
 save(gbmbase,file="../output/gbmmodel.RData")
 save(e,file="../output/gbmerror.RData")
+```
+
+
+##sift features (adaboost)
+
+```{r}
+
+
+
+
 ```
 
 
