@@ -13,9 +13,9 @@ library(dplyr)
 library(randomForest)
 library(parallel)
 library(e1071)
-source("../lib/cross_validation.R")
-source("../lib/train.R")
-source("../lib/test.R")
+#source("../lib/cross_validation.R")
+#source("../lib/train.R")
+#source("../lib/test.R")
 ```
 
 
