@@ -200,6 +200,8 @@ for (i in x){
 save(gbmbase,file="../output/gbmmodel.RData")
 save(e,file="../output/gbmerror.RData")
 save(gbmlabel,file="../output/gbmlabel.RData")
+results<-list(error=e[7],label=gbmlabel[[7]])
+save(results,file="../output/gbmresults.RData")
 ```
 
 
