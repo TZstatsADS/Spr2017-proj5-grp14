@@ -180,8 +180,7 @@ cv.function <- function(X.train, y.train, d, K){
 k<-2
 e<-c()
 gbmbase<-list()
-#for (i in 1:7){
-i<-3
+for (i in 1:7){
   cl <- makeCluster(getOption("cl.cores", 8))
   err<-parLapply(cl, 1:16, cv.function,X.train=tfeature[[i]], y.train=label, K=k)
   e[i]<-min(unlist(err))
@@ -192,7 +191,7 @@ i<-3
                      interaction.depth=d, 
                      bag.fraction = 0.5,
                      verbose=FALSE)
-#}
+}
 save(gbmbase,file="../output/gbmmodel.RData")
 save(e,file="../output/gbmerror.RData")
 ```
