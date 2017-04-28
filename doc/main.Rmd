@@ -5,36 +5,13 @@ date: "4/27/2017"
 output: pdf_document
 ---
 
-Revlevant packages needed for this file
-
-```{r "package import", message = FALSE, warnings = FALSE}
-list.of.packages <- c("e1071", "ggplot2", "gbm", "caret", "randomForest", "EBImage", "data.table", "dplyr")
-
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) 
-  {
-   install.packages(new.packages)
-   source("https://bioconductor.org/biocLite.R")
-   biocLite("EBImage")
-  }
-
-library(gbm)
-library(ggplot2)
-library(caret)
-library(randomForest)
-library(EBImage)
-library(data.table)
-library(dplyr)
-```
-
-
 # Part 1: Problem discription
 
 Where else but Quora can a physicist help a chef with a math problem and get cooking tips in return? Quora is a place to gain and share knowledge—about anything. It’s a platform to ask questions and connect with people who contribute unique insights and quality answers. This empowers people to learn from each other and to better understand the world.
 
 Over 100 million people visit Quora every month, so it's no surprise that many people ask similarly worded questions. Multiple questions with the same intent can cause seekers to spend more time finding the best answer to their question, and make writers feel they need to answer multiple versions of the same question. Quora values canonical questions because they provide a better experience to active seekers and writers, and offer more value to both of these groups in the long term.
 
-Currently, Quora uses a Random Forest model to identify duplicate questions. In this competition, Kagglers are challenged to tackle this natural language processing problem by applying advanced techniques to classify whether question pairs are duplicates or not. Doing so will make it easier to find high quality answers to questions resulting in an improved experience for Quora writers, seekers, and readers.
+So we tackled this natural language processing problem by applying advanced techniques to classify whether question pairs are duplicated or not. Doing so will make it easier to find high quality answers to questions resulting in an improved experience for Quora writers, seekers, and readers.
 
 # Part 2: Data exploration
 
@@ -48,10 +25,16 @@ head(Data)
 ## Constructed feature
 
 We constructed four features: 
-Similarity: The similarity between each pair of questions, including the length, same words.
-Interrogative word: 
-Parsing: The difference of parsing result in each pair of questions.
-???
+
+Similarity: counted the number of words in each question, measured the similarity between each pair of questions, including the number of same verbs and nouns.
+
+Interrogative word: which pair of interrogative words showed up in each pair of questions.
+
+Parsing: measured the difference of parsing result in each pair of questions.
+
+Basic properties: determine the amount of punctuations, modals and negative words, such as "non" and "not".
+
+Sentiment analysis: analysis the sentiment components in the sentences (based on the "bing" vocabulary).
 
 ```{r}
 feature <- read.csv("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/allfeatures.csv", header = TRUE)
@@ -59,32 +42,40 @@ head(feature)
 label <- Data$is_duplicate
 ```
 
-## Model training
+## Model training and results
 
 ### Random forest
 
-We trained 
+![Figure 1: GBM Cross Validation Results](~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/cv_rf.png)
 
 ```{r}
-
-
-
+load("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_test.RData")
+load("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_train.RData")
 ```
+
 
 ### adaboost
 
+```{r}
+
+```
 
 ### GBM
 
+```{r}
+load("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/gbmerror.RData")
+```
 
-
-
-# Part 4: Results
+# Part 4: Comparison
 
 
 ```{r}
-source(~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/lib/random forest.R)
-
 
 
 ```
+
+
+
+
+
+

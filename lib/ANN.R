@@ -26,16 +26,16 @@ data = cbind(label, scaled.data)
 names(data)[1] <- "classified"
 
 set.seed(426)
-split = sample.split(data$classified, SplitRatio = 0.75)
-train = subset(data, split == TRUE)
-test = subset(data, split == FALSE)
+split = sample(1:S, S*0.75)
+train = data[split, ]
+test = data[-split, ]
 
-feats <- names(scaled.data)[1:16]
+feats <- names(data)[t.inds]
 f <- paste(feats,collapse=' + ')
 f <- paste('classified ~',f)
 f <- as.formula(f)
 
-nn <- neuralnet(f, train[,1:17], hidden = c(2, 2, 2), linear.output = FALSE)
+nn <- neuralnet(f, train[,c(1,t.inds)], hidden = c(2, 2, 2), linear.output = FALSE)
 
 predicted.nn.values <- compute(nn,test[,2:108])
 print(head(predicted.nn.values$net.result))

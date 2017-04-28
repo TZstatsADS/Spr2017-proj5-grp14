@@ -52,25 +52,28 @@ RandomForestCV <- function(K = 5){
     pred <- RandomForestTest(fit, test.d)  
     cv.error[i] <- mean(pred != test.l)  
   }
-  return(mean(cv.error))
+  return(cv.error)
 }
 
-RandomForest <- function() {
-  # separate into training dataset and testing dataset
-  train.index <- sample(1:S, S*0.75)
-  train.data <- feature[train.index, ]
-  train.labels <- label[train.index]
-  test.data <- feature[-train.index, ]
-  test.label <- label[-train.index]
-  # train model
-  rf_model <- RandomForesTrain(train.data, train.labels)
-  rf_predict <- RandomForestTest(rf_model, test.data)
-  train_pred <- RandomForestTest(rf_model, train.data)
-  err_rf_train <- mean(train_pred != train.labels)
-  err_rf_test <- mean(rf_predict != test.label)
-  return(c(err_rf_train, err_rf_test))
-}
+rf.cv.err <- RandomForestCV()
+save(rf.cv.err, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/rf.cv.err.RData")
 
-save(rf_model, file = "rf_para.RData")
+
+# separate into training dataset and testing dataset
+train.index <- 1:(S*0.8)
+train.data <- feature[train.index, ]
+train.labels <- label[train.index]
+test.data <- feature[-train.index, ]
+test.label <- label[-train.index]
+# train model
+rf_model <- RandomForesTrain(train.data, train.labels)
+rf_predict <- RandomForestTest(rf_model, test.data)
+train_pred <- RandomForestTest(rf_model, train.data)
+err_rf_train <- mean(train_pred != train.labels)
+err_rf_test <- mean(rf_predict != test.label)
+
+
+
+save(rf_model, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/rf_para.RData")
 save(err_rf_test, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_test.RData")
 save(err_rf_train, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_train.RData")
