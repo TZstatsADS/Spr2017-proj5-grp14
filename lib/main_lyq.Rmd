@@ -247,6 +247,7 @@ evaluate<-matching_matrix(true.label,test.label)
 load(file="../output/rf_pred.RData")
 rf_predict<-ifelse(as.numeric(rf_predict)==1,0,1)
 evaluate2<-matching_matrix(rf_predict,test.label)
+save(evaluate2,file="../output/rfmatching.RData")
 ```
 
 
