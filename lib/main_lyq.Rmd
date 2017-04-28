@@ -241,6 +241,7 @@ load(file="../output/gbmresults.RData")
 test.label<-results$label
 true.label<-label[40001:50000]
 evaluate<-matching_matrix(true.label,test.label)
+save(evaluate,file="../output/gbmmatching.RData")
 ```
 
 
