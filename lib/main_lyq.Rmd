@@ -242,6 +242,11 @@ test.label<-results$label
 true.label<-label[40001:50000]
 evaluate<-matching_matrix(true.label,test.label)
 save(evaluate,file="../output/gbmmatching.RData")
+evaluate<-matching_matrix(true.label,test.label)
+
+load(file="../output/rf_pred.RData")
+rf_predict<-ifelse(as.numeric(rf_predict)==1,0,1)
+evaluate2<-matching_matrix(rf_predict,test.label)
 ```
 
 
