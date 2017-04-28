@@ -12,11 +12,11 @@ Term: Spring 2017
 + Project summary: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 	
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) 
-Boya Zhao: feature extraction(about Similiarity of length and differnt type of word), model training, writing final report and presentation.
+Boya Zhao: data cleaning, feature extraction(about Similiarity of length and differnt type of word), model training, contribut to the GitHub repository and prepare the presentation, presentor.
 
-Liangbin Chen: feature extraction(about the interrogative pairs and Similiarity), model training and help preparing presentation.
+Liangbin Chen: data cleaning, feature extraction(about the interrogative pairs and Similiarity), model training, contribut to the GitHub repository and prepare the presentation.
 
-Yaqin Li: feature extraction(about sentiment, modal, privative), model training and help preparing presentation.
+Yaqin Li: data cleaning, feature extraction(about sentiment analysis, modals, negative words and punctuations), model training, contribut to the GitHub repository and prepare the presentation.
 
 Yi Jiang: Give some idea in discussion
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
