@@ -17,7 +17,7 @@ So we tackled this natural language processing problem by applying advanced tech
 
 ```{r}
 setwd("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14")
-Data <- read.csv("../data/train.csv", header = TRUE)
+Data <- read.csv("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/data/train.csv", header = TRUE)
 head(Data)
 ```
 
@@ -45,21 +45,17 @@ label <- Data$is_duplicate
 
 ## Model training and results
 
-### Random forest
+We used sevel methods to train our models, including random forest, GBM, adaboost, SVM, ANN. Among all these methods, random forest has the best result.
 
-![Figure 1: GBM Cross Validation Results](~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/cv_rf.png)
+### Random forest
 
 ```{r}
 load("../output/err_rf_test.RData")
 load("../output/rf_pred.RData")
+err_rf_test
 ```
 
-
-### adaboost
-
-```{r}
-
-```
+![Figure 1: GBM Cross Validation Results](~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/cv_rf.png)
 
 ### GBM
 
@@ -67,34 +63,15 @@ load("../output/rf_pred.RData")
 load("../output/gbmresults.RData")
 err_gbm_test <- results[[1]]
 gbm_pred <- results[[2]]
+err_gbm_test
 ```
 
 # Part 4: Comparison
 
-
 ```{r}
-source('../lib/evaluation_measures.R', local = T)
-result.class.c <- prediction
-matching_matrix_rf <- matching_matrix(as.numeric(label[-train.index]), rf_predict)
-performance_rf <- performance_statistics(matching_matrix_rf)
-matching_matrix_ada <- matching_matrix(as.numeric(label[-train.index]),result.class.j)
-performance_ada <- performance_statistics(matching_matrix_ada)
-matching_matrix_gbm <- matching_matrix(as.numeric(label[-train.index]), gbm_pred)
-performance_gbm <- performance_statistics(matching_matrix_gbm)
-
-compare_df <- data.frame(method = c("Random Forest", "Adaboost", "GBM"),
-                         test.error = c(err_rf_test, err_gbm_test),
-                         precision = c(performance_rf$precision, performance_ada$precision, performance_gbm$precision),
-                         recall = c(performance_rf$recall, performance_ada$recall, performance_gbm$recall),
-                         f1 = c(performance_rf$f1, performance_ada$f1, performance_gbm$f1),
-                         accuracy = c(performance_rf$accuracy, performance_ada$accuracy, performance_gbm$accuracy))
-kable(compare_df,caption = "Comparision of performance for two clustering methods", digits = 2)
-
-
+test.label <- label[40001:50000]
+result.rf <- table(rf_predict, test.label)
+result.rf
+result.gbm <- result.gbm <- table(gbm_pred, test.label)
+result.gbm
 ```
-
-
-
-
-
-

@@ -5,7 +5,7 @@ library(randomForest)
 
 # read in features
 feature <- read.csv("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/allfeatures.csv", fill=TRUE, header = TRUE, stringsAsFactors = FALSE)
-feature <- feature[, -1]
+feature <- abs(feature[, -1])
 Data <- read.csv("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/data/train.csv")
 label <- Data$is_duplicate
 S <- 50000
@@ -79,3 +79,6 @@ save(err_rf_test, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp
 save(err_rf_train, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_train.RData")
 save(rf_predict, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/rf_pred.RData")
 
+
+matching_matrix_rf <- matching_matrix(test.label, rf_predict)
+save(matching_matrix_rf, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/rf_matching.RData")
