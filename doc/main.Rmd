@@ -27,11 +27,11 @@ head(Data)
 
 We constructed four features: 
 
-Similarity: counted the number of words in each question, measured the similarity between each pair of questions, including the number of same verbs and nouns.
+Similarity: counted the number of words in each question, measured the similarity between each pair of questions, including the number of same verbs, and the number of same nouns. The length of each question, the percentage of same words in each pari of questions.
 
-Interrogative word: which pair of interrogative words showed up in each pair of questions.
+Interrogative word: which pair of interrogative words showed up in each pair of questions. For example, if one question begins with “where” while the other one begins with “when”, it is quite obviously that these two questions are different. However, if one question begins with “What is your opinion”, another one begins with “How do feel about”, there’s a chance that these two questions are duplicated. So wo constructed a feature about the pair of interrogative words in two questions.
 
-Parsing: measured the difference of parsing result in each pair of questions.
+Parsing: measured the difference of parsing result in each pair of questions. After parsing each question, we got grammatical parts and we measure the differences between two questions.
 
 Basic properties: determine the amount of punctuations, modals and negative words, such as "non" and "not".
 
@@ -74,4 +74,10 @@ result.rf <- table(rf_predict, test.label)
 result.rf
 result.gbm <- result.gbm <- table(gbm_pred, test.label)
 result.gbm
+```
+
+```{r} 
+test.ques <- Data[40001:50000,]
+head(test.ques[rf_predict==1, 4:5])
+head(test.ques[rf_predict==1&test.ques$is_duplicate == 0, 4:5])
 ```

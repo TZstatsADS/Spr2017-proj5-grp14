@@ -82,3 +82,4 @@ save(rf_predict, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp1
 
 matching_matrix_rf <- matching_matrix(test.label, rf_predict)
 save(matching_matrix_rf, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/rf_matching.RData")
+load("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/rf_para.RData")
