@@ -77,3 +77,5 @@ err_rf_test <- mean(rf_predict != test.label)
 save(rf_model, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/rf_para.RData")
 save(err_rf_test, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_test.RData")
 save(err_rf_train, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_train.RData")
+save(rf_predict, file = "~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/rf_pred.RData")
+

@@ -16,7 +16,8 @@ So we tackled this natural language processing problem by applying advanced tech
 # Part 2: Data exploration
 
 ```{r}
-Data <- read.csv("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/data/train.csv", header = TRUE)
+setwd("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14")
+Data <- read.csv("../data/train.csv", header = TRUE)
 head(Data)
 ```
 
@@ -37,7 +38,7 @@ Basic properties: determine the amount of punctuations, modals and negative word
 Sentiment analysis: analysis the sentiment components in the sentences (based on the "bing" vocabulary).
 
 ```{r}
-feature <- read.csv("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/allfeatures.csv", header = TRUE)
+feature <- read.csv("../output/allfeatures.csv", header = TRUE)
 head(feature)
 label <- Data$is_duplicate
 ```
@@ -49,8 +50,8 @@ label <- Data$is_duplicate
 ![Figure 1: GBM Cross Validation Results](~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/cv_rf.png)
 
 ```{r}
-load("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_test.RData")
-load("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_train.RData")
+load("../output/err_rf_test.RData")
+load("../output/rf_pred.RData")
 ```
 
 
@@ -63,13 +64,31 @@ load("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/err_rf_tra
 ### GBM
 
 ```{r}
-load("~/Desktop/sem 2/Applied data science/Spr2017-proj5-grp14/output/gbmerror.RData")
+load("../output/gbmresults.RData")
+err_gbm_test <- results[[1]]
+gbm_pred <- results[[2]]
 ```
 
 # Part 4: Comparison
 
 
 ```{r}
+source('../lib/evaluation_measures.R', local = T)
+result.class.c <- prediction
+matching_matrix_rf <- matching_matrix(as.numeric(label[-train.index]), rf_predict)
+performance_rf <- performance_statistics(matching_matrix_rf)
+matching_matrix_ada <- matching_matrix(as.numeric(label[-train.index]),result.class.j)
+performance_ada <- performance_statistics(matching_matrix_ada)
+matching_matrix_gbm <- matching_matrix(as.numeric(label[-train.index]), gbm_pred)
+performance_gbm <- performance_statistics(matching_matrix_gbm)
+
+compare_df <- data.frame(method = c("Random Forest", "Adaboost", "GBM"),
+                         test.error = c(err_rf_test, err_gbm_test),
+                         precision = c(performance_rf$precision, performance_ada$precision, performance_gbm$precision),
+                         recall = c(performance_rf$recall, performance_ada$recall, performance_gbm$recall),
+                         f1 = c(performance_rf$f1, performance_ada$f1, performance_gbm$f1),
+                         accuracy = c(performance_rf$accuracy, performance_ada$accuracy, performance_gbm$accuracy))
+kable(compare_df,caption = "Comparision of performance for two clustering methods", digits = 2)
 
 
 ```
